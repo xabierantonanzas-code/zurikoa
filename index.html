@@ -86,7 +86,7 @@ nav.scrolled{background:rgba(4,9,15,.97);border-bottom:1px solid rgba(201,168,76
 #bottle-img{
   display:block;height:95vh;width:auto;
   object-fit:contain;object-position:bottom;
-  filter:url(#liquid-slosh) drop-shadow(0 0 80px rgba(139,26,26,.5)) drop-shadow(0 30px 60px rgba(0,0,0,.8));
+  filter:drop-shadow(0 0 80px rgba(139,26,26,.5)) drop-shadow(0 30px 60px rgba(0,0,0,.8));
   position:relative;z-index:1;
 }
 
@@ -626,14 +626,6 @@ footer{
   </div>
 </footer>
 
-<!-- SVG filter for liquid sloshing -->
-<svg style="position:absolute;width:0;height:0" aria-hidden="true">
-  <filter id="liquid-slosh" filterUnits="objectBoundingBox" x="0%" y="0%" width="100%" height="100%" color-interpolation-filters="sRGB">
-    <feTurbulence id="slosh-turb" type="turbulence" baseFrequency="0.02 0.04" numOctaves="3" seed="3" result="turb"/>
-    <feDisplacementMap id="slosh-disp" in="SourceGraphic" in2="turb" scale="0" xChannelSelector="R" yChannelSelector="G"/>
-  </filter>
-</svg>
-
 <script>
 gsap.registerPlugin(ScrollTrigger);
 
@@ -727,57 +719,10 @@ setTimeout(typePreLine, 800);
 const bimg = document.getElementById('bottle-img');
 let bx=0,by=0;
 window.addEventListener('mousemove', e => {
-  const nx=(e.clientX/innerWidth-.5)*12, ny=(e.clientY/innerHeight-.5)*6;
+  const nx=(e.clientX/innerWidth-.5)*16, ny=(e.clientY/innerHeight-.5)*10;
   bx+=(nx-bx)*.05; by+=(ny-by)*.05;
-  gsap.set(bimg, { rotateY:bx*.25, rotateX:-by*.15, x:nx*.3, transformPerspective:1000, transformOrigin:'center bottom' });
+  gsap.set(bimg, { rotateY:bx*.3, rotateX:-by*.2, x:nx*.4, transformPerspective:1000 });
 });
-
-// ── LIQUID SLOSHING EFFECT ──
-(function(){
-  var turb = document.getElementById('slosh-turb');
-  var disp = document.getElementById('slosh-disp');
-  if(!turb || !disp) return;
-
-  var lastX = 0, vel = 0, scale = 0;
-
-  // Desktop: track mouse velocity
-  window.addEventListener('mousemove', function(e){
-    vel = Math.max(vel, Math.abs(e.clientX - lastX) * 0.8);
-    lastX = e.clientX;
-  });
-
-  // Mobile: track gyroscope tilt
-  if('ontouchstart' in window && window.DeviceOrientationEvent){
-    var lastG = 0;
-    var startGyro = function(){
-      window.addEventListener('deviceorientation', function(e){
-        if(e.gamma !== null){
-          vel = Math.max(vel, Math.abs(e.gamma - lastG) * 2);
-          lastG = e.gamma;
-        }
-      });
-    };
-    if(typeof DeviceOrientationEvent.requestPermission === 'function'){
-      document.addEventListener('touchstart', function(){
-        DeviceOrientationEvent.requestPermission().then(function(r){ if(r==='granted') startGyro(); });
-      }, {once:true});
-    } else { startGyro(); }
-  }
-
-  // Animation loop
-  function loop(){
-    requestAnimationFrame(loop);
-    var target = Math.min(vel, 10);
-    scale += (target - scale) * (target > scale ? 0.2 : 0.03);
-    vel *= 0.88;
-    if(scale < 0.3) scale = 0;
-    disp.setAttribute('scale', scale);
-    var t = performance.now();
-    turb.setAttribute('baseFrequency',
-      (0.02 + Math.sin(t*0.002)*0.005) + ' ' + (0.04 + Math.cos(t*0.003)*0.008));
-  }
-  loop();
-})();
 
 // ── SCROLL PARALLAX ──
 gsap.to('.hero-bottle', {
@@ -844,6 +789,5 @@ gsap.fromTo('.step',{opacity:0,y:30},{opacity:1,y:0,duration:.7,stagger:.1,ease:
 // ── SPEC ROWS stagger ──
 gsap.fromTo('.spec-row',{opacity:0,x:20},{opacity:1,x:0,duration:.5,stagger:.06,ease:'power2.out',scrollTrigger:{trigger:'.prod-specs',start:'top 92%'}});
 </script>
-
 </body>
 </html>
