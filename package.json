@@ -1,0 +1,14 @@
+{
+  "name": "zurikoa",
+  "private": true,
+  "version": "1.0.0",
+  "description": "ZURIKOA — Patxarán artesanal de Zúrich",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "devDependencies": {
+    "vite": "^6.3.1"
+  }
+}
